@@ -3,8 +3,14 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const logger = require('./config/logger')
+const connectDB = require('./config/db')
+const authRoutes = require('./routes/authRoutes')
+const taskRoutes = require('./routes/taskRoutes')
+const aplicareRoutes = require('./routes/aplicareRoutes');
 
 dotenv.config()
+
+connectDB()
 
 const app = express()
 
@@ -17,6 +23,10 @@ app.use(morgan('dev', {
         write: (message) => logger.info(message.trim())
     }
 }))
+
+app.use('/api/auth', authRoutes)
+app.use('/api/taskuri', taskRoutes)
+app.use('/api/aplicari', aplicareRoutes);
 
 app.get('/api/status', (req, res) => {
     logger.info('Cineva a accesat ruta de status.')
