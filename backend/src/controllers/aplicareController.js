@@ -88,3 +88,13 @@ exports.acceptaOferta = async (req, res) => {
         res.status(500).json({ mesaj: 'Eroare la server' });
     }
 };
+
+exports.getAplicariPrestator = async (req, res) => {
+    try {
+        const aplicari = await Aplicare.find({ id_prestator: req.utilizator._id }).populate('id_task', 'titlu descriere status_task');
+        res.status(200).json(aplicari);
+    } catch (eroare) {
+        logger.error(`Eroare la preluarea aplicarilor prestatorului: ${eroare.message}`);
+        res.status(500).json({ mesaj: 'Eroare la server' });
+    }
+};

@@ -34,3 +34,25 @@ exports.getTasks = async (req, res) => {
         res.status(500).json({ mesaj: 'Eroare la server' })
     }
 }
+
+exports.finalizeazaTask = async (req, res) => {
+    try {
+        const idTask = req.params.id;
+
+        const task = await Task.findById(idTask);
+        if (!task) {
+            return res.status(404).json({ mesaj: 'Task-ul nu a fost gasit.' });
+        }
+
+        if (task.id_beneficiar.toString() !== req.utilizator._id.toString()) {
+            return res.status(403).json({ mesaj: 'Doar proprietarul poate finaliza acest task.' });
+        }
+
+        task.status_task = 'finalizat';
+        await task.save();
+
+        res.status(200).json({ mesaj: 'Task finalizat cu succes!', task });
+    } catch (eroare) {
+        res.status(500).json({ mesaj: 'Eroare la finalizarea task-ului.', eroare: eroare.message });
+    }
+};

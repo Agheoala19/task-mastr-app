@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import TaskList from './components/TaskList'
 import Login from './components/Login'
 import Inregistrare from './components/Inregistrare'
+import Profil from './components/Profil'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ function App() {
         const payload = JSON.parse(atob(token.split('.')[1]));
         setUtilizatorCurent(payload);
         setIsLoggedIn(true);
+        setView('tasks');
       } catch (e) {
         console.error("Eroare la decodarea token-ului");
       }
@@ -64,10 +66,14 @@ function App() {
             />
           )
         ) : (
-          <TaskList
-            utilizatorCurent={utilizatorCurent}
-            termenCautare={termenCautare}
-          />
+          view === 'tasks' ? (
+            <TaskList
+              utilizatorCurent={utilizatorCurent}
+              termenCautare={termenCautare}
+            />
+          ) : (
+            <Profil utilizatorCurent={utilizatorCurent} />
+          )
         )}
       </main>
     </div>
