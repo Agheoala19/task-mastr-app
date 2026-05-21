@@ -1,5 +1,6 @@
 const Aplicare = require('../models/Aplicare');
 const Task = require('../models/Task');
+const Notificare = require('../models/Notificare');
 const logger = require('../config/logger');
 
 exports.creareAplicare = async (req, res) => {
@@ -28,6 +29,12 @@ exports.creareAplicare = async (req, res) => {
         });
 
         const aplicareSalvata = await aplicareNoua.save();
+
+        const notificareNoua = new Notificare({
+            id_utilizator: task.id_beneficiar,
+            mesaj: `Ai primit o oferta noua de la un mester pentru anuntul "${task.titlu}".`
+        });
+        await notificareNoua.save();
         logger.info(`Aplicare nouă de la ${req.utilizator.email} pentru task-ul ${id_task}`);
 
         res.status(201).json({ mesaj: 'Ai aplicat cu succes!', aplicare: aplicareSalvata });
@@ -41,7 +48,7 @@ exports.getAplicariPentruTask = async (req, res) => {
     try {
         const { id_task } = req.params;
 
-        const aplicari = await Aplicare.find({ id_task }).populate('id_prestator', 'nume prenume telefon email');
+        const aplicari = await Aplicare.find({ id_task }).populate('id_prestator', 'nume prenume telefon email rating_mediu');
 
         res.status(200).json(aplicari);
     } catch (eroare) {
@@ -71,6 +78,12 @@ exports.acceptaOferta = async (req, res) => {
         task.status_task = 'in desfasurare';
         task.id_prestator_selectat = aplicare.id_prestator;
         await task.save();
+
+        const notificareNoua = new Notificare({
+            id_utilizator: aplicare.id_prestator,
+            mesaj: `Felicitari! Oferta ta pentru anuntul "${task.titlu}" a fost acceptata. Poti incepe lucrarea.`
+        });
+        await notificareNoua.save();
 
         aplicare.status_aplicare = 'acceptat';
         await aplicare.save();

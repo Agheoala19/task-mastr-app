@@ -1,5 +1,6 @@
 import React from 'react';
 import './Navbar.css';
+import NotificariDropdown from './NotificariDropdown';
 import { FaSearch } from 'react-icons/fa';
 
 function Navbar({ isLoggedIn, onLogout, onNavigate, onSearch }) {
@@ -31,6 +32,7 @@ function Navbar({ isLoggedIn, onLogout, onNavigate, onSearch }) {
                     </>
                 ) : (
                     <>
+                        <NotificariDropdown />
                         <li className="nav-item">
                             <button onClick={() => onNavigate('profil')} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'inherit' }}>
                                 Profil

@@ -84,3 +84,12 @@ exports.logare = async (req, res) => {
         res.status(500).json({ mesaj: 'Eroare la server!' })
     }
 }
+
+exports.getProfilUtilizator = async (req, res) => {
+    try {
+        const utilizator = await Utilizator.findById(req.utilizator._id).select('-parola');
+        res.status(200).json(utilizator);
+    } catch (eroare) {
+        res.status(500).json({ mesaj: 'Eroare la preluarea profilului.' });
+    }
+};

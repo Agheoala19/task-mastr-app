@@ -9,6 +9,10 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Descrierea este obligatorie']
     },
+    imagine: {
+        type: String,
+        default: null
+    },
     buget_estimativ: {
         type: Number,
         required: [true, 'Bugetul este obligatoriu']
@@ -36,7 +40,7 @@ const taskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Utilizator',
         default: null
-    }
+    },
 }, {
     timestamps: true
 })

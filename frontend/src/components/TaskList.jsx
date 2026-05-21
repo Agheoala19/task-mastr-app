@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import AdaugaTask from './AdaugaTask';
+import { FaStar } from 'react-icons/fa';
 
 function TaskList({ utilizatorCurent, termenCautare = '' }) {
     const [taskuri, setTaskuri] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [oferte, setOferte] = useState({});
     const [arataFormular, setArataFormular] = useState(false);
 
     const idUser = utilizatorCurent?.id || utilizatorCurent?._id;
@@ -26,27 +26,6 @@ function TaskList({ utilizatorCurent, termenCautare = '' }) {
     useEffect(() => {
         fetchTaskuri();
     }, []);
-
-    const incarcaOferte = async (id_task) => {
-        if (oferte[id_task]) return;
-        try {
-            const response = await api.get(`/aplicari/task/${id_task}`);
-            setOferte(prevOferte => ({ ...prevOferte, [id_task]: response.data }));
-        } catch (error) {
-            console.error("Eroare la preluarea ofertelor:", error);
-        }
-    };
-
-    const handleAcceptaOferta = async (id_aplicare) => {
-        try {
-            await api.put(`/aplicari/${id_aplicare}/accepta`);
-            alert('Oferta a fost acceptata cu succes!');
-            fetchTaskuri();
-        } catch (error) {
-            console.error("Eroare la acceptare:", error);
-            alert(error.response?.data?.mesaj || 'A aparut o eroare.');
-        }
-    };
 
     const handleAplica = async (id_task) => {
         const mesaj = prompt("Introdu un scurt mesaj pentru client:");
@@ -134,17 +113,20 @@ function TaskList({ utilizatorCurent, termenCautare = '' }) {
                                 )}
 
                                 <p style={{ color: '#666' }}>{task.descriere}</p>
+
+                                {task.imagine && (
+                                    <div style={{ margin: '1rem 0' }}>
+                                        <img
+                                            src={`http://localhost:5000${task.imagine}`}
+                                            alt="Imagine atasata"
+                                            style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: '6px', objectFit: 'cover', display: 'block' }}
+                                        />
+                                    </div>
+                                )}
+
                                 <p style={{ margin: '0.5rem 0', fontSize: '0.9rem', color: '#555' }}>Locatie: {task.locatie}</p>
 
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                    {isOwner && (
-                                        <button
-                                            onClick={() => incarcaOferte(task._id)}
-                                            style={{ padding: '0.5rem 1rem', backgroundColor: '#11998e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                                        >
-                                            Vezi Ofertele
-                                        </button>
-                                    )}
 
                                     {rolUser === 'prestator' && task.status_task === 'deschis' && (
                                         <button
@@ -155,35 +137,6 @@ function TaskList({ utilizatorCurent, termenCautare = '' }) {
                                         </button>
                                     )}
                                 </div>
-
-                                {isOwner && oferte[task._id] && (
-                                    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f1f8f5', borderRadius: '8px', borderLeft: '4px solid #11998e' }}>
-                                        <h4 style={{ margin: '0 0 1rem 0', color: '#11998e' }}>Oferte primite:</h4>
-                                        {oferte[task._id].length === 0 ? (
-                                            <p style={{ margin: 0, fontSize: '0.9rem' }}>Nicio oferta inca.</p>
-                                        ) : (
-                                            oferte[task._id].map(oferta => (
-                                                <div key={oferta._id} style={{ borderBottom: '1px solid #ddd', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                                                        <strong>{oferta.id_prestator?.nume || 'Mester'}</strong>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                            <strong style={{ color: '#d32f2f' }}>Cere: {oferta.pret_propus} RON</strong>
-                                                            {task.status_task === 'deschis' && (
-                                                                <button
-                                                                    onClick={() => handleAcceptaOferta(oferta._id)}
-                                                                    style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                                                                >
-                                                                    Accepta
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <p style={{ margin: 0, fontSize: '0.9rem', fontStyle: 'italic' }}>"{oferta.mesaj_oferta}"</p>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                )}
                             </div>
                         )
                     })}
