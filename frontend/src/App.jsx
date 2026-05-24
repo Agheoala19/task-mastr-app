@@ -7,6 +7,7 @@ import TaskList from './components/TaskList'
 import Login from './components/Login'
 import Inregistrare from './components/Inregistrare'
 import Profil from './components/Profil'
+import Chat from './components/Chat'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,6 +52,8 @@ function App() {
         onNavigate={(newView) => setView(newView)}
         onSearch={setTermenCautare}
       />
+
+      <Chat utilizatorCurent={utilizatorCurent} />
 
       <main>
         {!isLoggedIn ? (

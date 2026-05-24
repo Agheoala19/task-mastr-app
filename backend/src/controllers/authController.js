@@ -87,9 +87,37 @@ exports.logare = async (req, res) => {
 
 exports.getProfilUtilizator = async (req, res) => {
     try {
-        const utilizator = await Utilizator.findById(req.utilizator._id).select('-parola');
-        res.status(200).json(utilizator);
+        const utilizator = await Utilizator.findById(req.utilizator._id).select('-parola')
+        res.status(200).json(utilizator)
     } catch (eroare) {
-        res.status(500).json({ mesaj: 'Eroare la preluarea profilului.' });
+        res.status(500).json({ mesaj: 'Eroare la preluarea profilului.' })
+    }
+}
+
+exports.actualizareProfil = async (req, res) => {
+    try {
+        const { nume, prenume, telefon, bio } = req.body;
+
+        const utilizator = await Utilizator.findById(req.utilizator._id);
+        if (!utilizator) {
+            return res.status(404).json({ mesaj: 'Utilizatorul nu a fost gasit.' });
+        }
+
+        if (nume) utilizator.nume = nume;
+        if (prenume) utilizator.prenume = prenume;
+        if (telefon) utilizator.telefon = telefon;
+        if (bio !== undefined) utilizator.bio = bio;
+
+        if (req.file) {
+            utilizator.avatar = '/uploads/' + req.file.filename;
+        }
+
+        await utilizator.save();
+
+        const utilizatorActualizat = await Utilizator.findById(utilizator._id).select('-parola');
+        res.status(200).json({ mesaj: 'Profil actualizat cu succes!', utilizator: utilizatorActualizat });
+    } catch (eroare) {
+        res.status(500).json({ mesaj: 'Eroare la actualizarea profilului.', eroare: eroare.message });
     }
 };
+

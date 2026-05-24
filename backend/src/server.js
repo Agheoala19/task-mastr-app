@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes')
 const taskRoutes = require('./routes/taskRoutes')
 const aplicareRoutes = require('./routes/aplicareRoutes')
 const notificareRoutes = require('./routes/notificareRoutes')
+const mesajRoutes = require('./routes/mesajRoutes')
 const path = require('path')
 
 dotenv.config()
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/taskuri', taskRoutes)
 app.use('/api/aplicari', aplicareRoutes);
 app.use('/api/notificari', notificareRoutes)
+app.use('/api/mesaje', mesajRoutes)
 
 app.get('/api/status', (req, res) => {
     logger.info('Cineva a accesat ruta de status.')

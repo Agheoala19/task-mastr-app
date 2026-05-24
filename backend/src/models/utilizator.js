@@ -45,6 +45,14 @@ const utilizatorSchema = new mongoose.Schema({
         type: String,
         enum: ['beneficiar', 'prestator'],
         default: 'beneficiar'
+    },
+    avatar: {
+        type: String,
+        default: null
+    },
+    bio: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true
