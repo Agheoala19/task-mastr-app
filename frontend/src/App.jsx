@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import Navbar from './components/Navbar'
@@ -14,6 +13,7 @@ function App() {
   const [view, setView] = useState('login');
   const [utilizatorCurent, setUtilizatorCurent] = useState(null);
   const [termenCautare, setTermenCautare] = useState('');
+  const [taskTarget, setTaskTarget] = useState(null);
 
   const decodareToken = () => {
     const token = localStorage.getItem('token');
@@ -38,10 +38,16 @@ function App() {
     setIsLoggedIn(false);
     setView('login');
     setUtilizatorCurent(null);
+    setTaskTarget(null);
   };
 
   const handleAuthSuccess = () => {
     decodareToken();
+  };
+
+  const handleNavigate = (newView, taskId = null) => {
+    setView(newView);
+    setTaskTarget(taskId);
   };
 
   return (
@@ -49,7 +55,7 @@ function App() {
       <Navbar
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
-        onNavigate={(newView) => setView(newView)}
+        onNavigate={handleNavigate}
         onSearch={setTermenCautare}
       />
 
@@ -60,12 +66,12 @@ function App() {
           view === 'login' ? (
             <Login
               onLoginSuccess={handleAuthSuccess}
-              onGoToRegister={() => setView('register')}
+              onGoToRegister={() => handleNavigate('register')}
             />
           ) : (
             <Inregistrare
               onInregistrareSuccess={handleAuthSuccess}
-              onInapoiLaLogin={() => setView('login')}
+              onInapoiLaLogin={() => handleNavigate('login')}
             />
           )
         ) : (
@@ -73,9 +79,13 @@ function App() {
             <TaskList
               utilizatorCurent={utilizatorCurent}
               termenCautare={termenCautare}
+              onNavigate={handleNavigate}
             />
           ) : (
-            <Profil utilizatorCurent={utilizatorCurent} />
+            <Profil
+              utilizatorCurent={utilizatorCurent}
+              taskTarget={taskTarget}
+            />
           )
         )}
       </main>
@@ -83,4 +93,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

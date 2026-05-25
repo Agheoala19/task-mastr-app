@@ -9,6 +9,7 @@ function Chat({ utilizatorCurent }) {
     const [mesajNou, setMesajNou] = useState('');
 
     const mesajeEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     const fetchConversatii = async () => {
         try {
@@ -52,6 +53,20 @@ function Chat({ utilizatorCurent }) {
         mesajeEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [mesaje]);
 
+    useEffect(() => {
+        const handleClickInAfara = (event) => {
+            if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+                setMeniuDeschis(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickInAfara);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickInAfara);
+        };
+    }, []);
+
     const handleTrimite = async (e) => {
         e.preventDefault();
         if (!mesajNou.trim() || !chatActiv) return;
@@ -73,7 +88,7 @@ function Chat({ utilizatorCurent }) {
     if (!utilizatorCurent) return null;
 
     return (
-        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
+        <div ref={chatContainerRef} style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
 
             {meniuDeschis && (
                 <div style={{
@@ -98,7 +113,7 @@ function Chat({ utilizatorCurent }) {
                                             style={{
                                                 padding: '12px', borderRadius: '8px', cursor: 'pointer', border: '1px solid #eee',
                                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                                backgroundColor: conv.necitite > 0 ? 'white' : '#f0f0f0' // Alb pt necitite, Gri pt citite
+                                                backgroundColor: conv.necitite > 0 ? 'white' : '#f0f0f0'
                                             }}
                                         >
                                             <div>
@@ -110,7 +125,6 @@ function Chat({ utilizatorCurent }) {
                                                 </div>
                                             </div>
 
-                                            {/* Badge numar mesaje pt fiecare conversatie */}
                                             {conv.necitite > 0 && (
                                                 <div style={{ backgroundColor: '#e74c3c', color: 'white', borderRadius: '50%', padding: '4px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
                                                     {conv.necitite}

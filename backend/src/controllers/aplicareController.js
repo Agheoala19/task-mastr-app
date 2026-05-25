@@ -32,6 +32,7 @@ exports.creareAplicare = async (req, res) => {
 
         const notificareNoua = new Notificare({
             id_utilizator: task.id_beneficiar,
+            id_task: task._id,
             mesaj: `Ai primit o oferta noua de la un mester pentru anuntul "${task.titlu}".`
         });
         await notificareNoua.save();
@@ -59,46 +60,38 @@ exports.getAplicariPentruTask = async (req, res) => {
 
 exports.acceptaOferta = async (req, res) => {
     try {
-        const { id_aplicare } = req.params;
+        const aplicare = await Aplicare.findById(req.params.id_aplicare);
 
-        const aplicare = await Aplicare.findById(id_aplicare);
-        if (!aplicare) {
-            return res.status(404).json({ mesaj: 'Oferta nu a fost gasita!' });
-        }
+        if (!aplicare) return res.status(404).json({ mesaj: 'Oferta nu a fost gasita.' });
 
         const task = await Task.findById(aplicare.id_task);
-        if (!task) {
-            return res.status(404).json({ mesaj: 'Task-ul nu mai exista!' });
-        }
-
         if (task.id_beneficiar.toString() !== req.utilizator._id.toString()) {
-            return res.status(403).json({ mesaj: 'Eroare: Doar proprietarul anuntului poate accepta oferte!' });
+            return res.status(403).json({ mesaj: 'Nu ai permisiunea de a accepta oferte pentru acest anunt.' });
         }
-
-        task.status_task = 'in desfasurare';
-        task.id_prestator_selectat = aplicare.id_prestator;
-        await task.save();
-
-        const notificareNoua = new Notificare({
-            id_utilizator: aplicare.id_prestator,
-            mesaj: `Felicitari! Oferta ta pentru anuntul "${task.titlu}" a fost acceptata. Poti incepe lucrarea.`
-        });
-        await notificareNoua.save();
 
         aplicare.status_aplicare = 'acceptat';
         await aplicare.save();
 
         await Aplicare.updateMany(
-            { id_task: task._id, _id: { $ne: id_aplicare } },
+            { id_task: task._id, _id: { $ne: aplicare._id } },
             { $set: { status_aplicare: 'respins' } }
         );
 
-        logger.info(`Oferta ${id_aplicare} a fost acceptata pentru task-ul ${task._id}`);
-        res.status(200).json({ mesaj: 'Oferta a fost acceptata cu succes!', task });
+        task.status_task = 'in desfasurare';
+        task.id_prestator_selectat = aplicare.id_prestator;
+        await task.save();
 
+        const Notificare = require('../models/Notificare');
+        const notificareNoua = new Notificare({
+            id_utilizator: aplicare.id_prestator,
+            id_task: task._id,
+            mesaj: `Felicitari! Oferta ta pentru anuntul "${task.titlu}" a fost acceptata. Poti incepe lucrarea.`
+        });
+        await notificareNoua.save();
+
+        res.status(200).json({ mesaj: 'Oferta acceptata. Restul au fost respinse automat.' });
     } catch (eroare) {
-        logger.error(`Eroare la acceptarea ofertei: ${eroare.message}`);
-        res.status(500).json({ mesaj: 'Eroare la server' });
+        res.status(500).json({ mesaj: 'Eroare la acceptarea ofertei.', eroare: eroare.message });
     }
 };
 

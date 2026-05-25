@@ -6,6 +6,10 @@ const notificareSchema = new mongoose.Schema({
         ref: 'Utilizator',
         required: true
     },
+    id_task: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task'
+    },
     mesaj: {
         type: String,
         required: true

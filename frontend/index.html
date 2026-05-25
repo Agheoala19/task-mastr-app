@@ -3,9 +3,53 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/svg+xml" href="/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TaskMastR</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface": "#f8f9fa",
+            "primary": "#006860",
+            "on-primary": "#ffffff",
+            "outline": "#6d7a77",
+            "surface-container-low": "#f3f4f5",
+            "on-surface-variant": "#3d4947",
+            "on-surface": "#191c1d",
+            "primary-container": "#008379",
+            "on-primary-container": "#f3fffc",
+            "outline-variant": "#bcc9c6",
+            "error": "#ba1a1a"
+          },
+          "fontFamily": {
+            "headline-md": ["Inter"],
+            "label-md": ["Inter"],
+            "body-md": ["Inter"]
+          },
+          "spacing": {
+            "container-max": "1280px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    .nav-shadow {
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+  </style>
 </head>
 
 <body>

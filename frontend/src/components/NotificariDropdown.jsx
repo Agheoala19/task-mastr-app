@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../api';
-import { FaBell } from 'react-icons/fa';
 
-function NotificariDropdown() {
+function NotificariDropdown({ onNavigate }) {
     const [notificari, setNotificari] = useState([]);
     const [meniuDeschis, setMeniuDeschis] = useState(false);
     const dropdownRef = useRef(null);
@@ -46,58 +45,84 @@ function NotificariDropdown() {
         }
     };
 
+    const handleClickNotificare = (id_task) => {
+        setMeniuDeschis(false);
+        if (onNavigate) {
+            onNavigate('profil', id_task);
+        }
+    };
+
     const notificariNecitite = notificari.filter(n => !n.citita).length;
 
     return (
-        <div ref={dropdownRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div ref={dropdownRef} className="relative flex items-center">
+
             <button
                 onClick={toggleMeniu}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', position: 'relative', padding: '0.5rem' }}
+                className="relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all bg-transparent border-none cursor-pointer flex items-center justify-center"
             >
-                <FaBell size={24} color="#11998e" />
+                <span className="material-symbols-outlined">notifications</span>
 
                 {notificariNecitite > 0 && (
-                    <span style={{
-                        position: 'absolute', top: '0', right: '0',
-                        backgroundColor: '#d32f2f', color: 'white',
-                        borderRadius: '50%', padding: '2px 6px',
-                        fontSize: '0.7rem', fontWeight: 'bold'
-                    }}>
+                    <span className="absolute top-1 right-1 w-[18px] h-[18px] bg-error rounded-full border-2 border-surface flex items-center justify-center text-white text-[10px] font-bold">
                         {notificariNecitite}
                     </span>
                 )}
             </button>
 
             {meniuDeschis && (
-                <div style={{
-                    position: 'absolute', top: '45px', right: '0',
-                    width: '320px', maxHeight: '400px', overflowY: 'auto',
-                    backgroundColor: 'white', border: '1px solid #e0e0e0',
-                    borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    zIndex: 1000, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '10px'
-                }}>
-                    <h4 style={{ margin: '0 0 10px 0', borderBottom: '2px solid #38ef7d', paddingBottom: '5px', color: '#333' }}>
-                        Notificări
-                    </h4>
+                <div className="absolute top-[50px] right-0 w-[350px] bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container-highest overflow-hidden z-[1000] flex flex-col">
 
-                    {notificari.length === 0 ? (
-                        <p style={{ margin: 0, color: '#888', fontSize: '0.9rem', textAlign: 'center' }}>Nu ai nicio notificare.</p>
-                    ) : (
-                        notificari.map(notificare => (
-                            <div key={notificare._id} style={{
-                                padding: '10px',
-                                borderRadius: '6px',
-                                backgroundColor: notificare.citita ? '#f9f9f9' : '#eafaf1',
-                                borderLeft: notificare.citita ? 'none' : '4px solid #11998e',
-                                fontSize: '0.9rem', color: '#444'
-                            }}>
-                                {notificare.mesaj}
-                                <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '5px' }}>
-                                    {new Date(notificare.createdAt).toLocaleString('ro-RO')}
+                    <div className="p-4 border-b border-surface-container-highest flex justify-between items-center bg-surface-bright">
+                        <h4 className="font-bold text-on-surface font-label-md m-0">Notificări</h4>
+                    </div>
+
+                    <div className="max-h-[380px] overflow-y-auto">
+
+                        {notificari.length === 0 ? (
+                            <div className="py-12 flex flex-col items-center justify-center text-center px-8">
+                                <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-[40px] text-outline-variant">notifications_off</span>
                                 </div>
+                                <p className="text-on-surface font-semibold m-0">Nu ai nicio notificare.</p>
                             </div>
-                        ))
-                    )}
+                        ) : (
+                            notificari.map(notificare => (
+                                <div
+                                    key={notificare._id}
+                                    onClick={() => handleClickNotificare(notificare.id_task)}
+                                    className={`relative flex gap-4 p-4 border-b border-surface-container-highest group cursor-pointer transition-colors ${notificare.citita
+                                        ? 'bg-white hover:bg-surface-container-low'
+                                        : 'bg-primary-container/10 hover:bg-primary-container/20'
+                                        }`}
+                                >
+                                    {!notificare.citita && (
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+                                    )}
+
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${notificare.citita ? 'bg-surface-container-highest' : 'bg-primary-container'
+                                        }`}>
+                                        <span className={`material-symbols-outlined ${notificare.citita ? 'text-on-surface-variant' : 'text-on-primary-container'
+                                            }`}>
+                                            {notificare.citita ? 'chat' : 'task_alt'}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`m-0 leading-tight ${notificare.citita
+                                            ? 'text-on-surface-variant font-medium text-label-md'
+                                            : 'text-on-surface font-semibold text-label-md'
+                                            }`}>
+                                            {notificare.mesaj}
+                                        </p>
+                                        <span className="text-outline text-[11px] font-medium mt-2 block">
+                                            {new Date(notificare.createdAt).toLocaleString('ro-RO')}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             )}
         </div>

@@ -30,16 +30,18 @@ const taskSchema = new mongoose.Schema({
         ref: 'Utilizator',
         required: true
     },
-    id_categorie: {
-        type: String
-    },
-    id_oras: {
-        type: String
-    },
     id_prestator_selectat: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Utilizator',
         default: null
+    },
+    locatie: {
+        type: String,
+        default: 'Nespecificat'
+    },
+    categorie: {
+        type: String,
+        default: 'Reparații și Întreținere'
     },
 }, {
     timestamps: true

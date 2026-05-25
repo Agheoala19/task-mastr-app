@@ -2,11 +2,12 @@ const Task = require('../models/Task')
 const logger = require('../config/logger')
 const Utilizator = require('../models/Utilizator')
 const Recenzie = require('../models/Recenzie')
-const Notificare = require('../models/Notificare');
+const Notificare = require('../models/Notificare')
+const Aplicare = require('../models/Aplicare')
 
 exports.creareTask = async (req, res) => {
     try {
-        const { titlu, descriere, buget_estimativ, data_limita, id_categorie, id_oras } = req.body
+        const { titlu, descriere, buget_estimativ, data_limita, locatie } = req.body
 
         let imaginePath = null;
         if (req.file) {
@@ -18,8 +19,7 @@ exports.creareTask = async (req, res) => {
             descriere,
             buget_estimativ,
             data_limita,
-            id_categorie,
-            id_oras,
+            locatie,
             id_beneficiar: req.utilizator._id,
             imagine: imaginePath
         })
@@ -46,26 +46,27 @@ exports.getTasks = async (req, res) => {
 
 exports.stergeTask = async (req, res) => {
     try {
-        const idTask = req.params.id
+        const idTask = req.params.id;
 
-        const task = await Task.findById(idTask)
+        const task = await Task.findById(idTask);
         if (!task) {
-            return res.status(404).json({ mesaj: 'Task-ul nu a fost gasit' })
+            return res.status(404).json({ mesaj: 'Anuntul nu a fost gasit.' });
         }
 
-        if (task.id_beneficiar.toString() !== req.utilizator._id.toString()) {
+        if (task.id_beneficiar.toString() !== req.utilizator._id.toString() && req.utilizator.rol !== 'administrator') {
             return res.status(403).json({ mesaj: 'Nu ai permisiunea de a sterge acest anunt.' });
         }
 
         await Task.findByIdAndDelete(idTask);
 
-        res.status(200).json({ mesaj: 'Anunt sters cu succes!' });
+        await Aplicare.deleteMany({ id_task: idTask });
 
-
+        res.status(200).json({ mesaj: 'Anuntul si toate ofertele asociate au fost sterse cu succes!' });
     } catch (eroare) {
-        res.status(500).json({ mesaj: 'Eroare la stergerea task-ului.', eroare: eroare.message });
+        console.error("Eroare la stergere task:", eroare);
+        res.status(500).json({ mesaj: 'Eroare la stergerea anuntului.', eroare: eroare.message });
     }
-}
+};
 
 exports.editeazaTask = async (req, res) => {
     try {
@@ -145,6 +146,7 @@ exports.finalizeazaTask = async (req, res) => {
 
         const notificareNoua = new Notificare({
             id_utilizator: task.id_prestator_selectat,
+            id_task: task._id,
             mesaj: `Clientul a finalizat task-ul "${task.titlu}" si ti-a acordat o nota de ${rating} stele.`
         })
         await notificareNoua.save();
@@ -152,5 +154,30 @@ exports.finalizeazaTask = async (req, res) => {
         res.status(200).json({ mesaj: "Task finalizat si recenzie salvata!", medie: medieNoua });
     } catch (eroare) {
         res.status(500).json({ mesaj: "Eroare la finalizare.", eroare: eroare.message });
+    }
+};
+
+exports.getTaskuriPaginate = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const totalAnunturi = await Task.countDocuments({ status_task: 'deschis' });
+        const totalPages = Math.ceil(totalAnunturi / limit);
+
+        const taskuri = await Task.find({ status_task: 'deschis' })
+            .populate('id_beneficiar', 'nume prenume avatar rating_mediu')
+            .sort({ createdAt: -1 }) // Cele mai noi primele
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            taskuri,
+            totalPages,
+            currentPage: page
+        });
+    } catch (eroare) {
+        res.status(500).json({ mesaj: 'Eroare la preluarea anunturilor.', eroare: eroare.message });
     }
 };

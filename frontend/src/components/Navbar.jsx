@@ -1,62 +1,93 @@
 import React from 'react';
-import './Navbar.css';
 import NotificariDropdown from './NotificariDropdown';
-import { FaSearch } from 'react-icons/fa';
 
 function Navbar({ isLoggedIn, onLogout, onNavigate, onSearch }) {
     return (
-        <nav className="navbar">
-            <div className="navbar-brand">
-                <h1>TaskMastR</h1>
-            </div>
+        <header className="bg-surface sticky top-0 z-50 nav-shadow">
+            <div className="flex justify-between items-center w-full px-4 md:px-8 h-16 max-w-container-max mx-auto">
 
-            <ul className="nav-links">
-                <li className="nav-item">
-                    <button onClick={() => onNavigate(isLoggedIn ? 'tasks' : 'login')} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'inherit' }}>
-                        Acasa
+                <div className="flex items-center gap-12">
+                    <button
+                        onClick={() => onNavigate(isLoggedIn ? 'tasks' : 'login')}
+                        className="font-headline-md text-2xl font-extrabold text-primary tracking-tight bg-transparent border-none cursor-pointer"
+                    >
+                        TaskMastR
                     </button>
-                </li>
 
-                {!isLoggedIn ? (
-                    <>
-                        <li className="nav-item">
-                            <button onClick={() => onNavigate('login')} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'inherit' }}>
+                    <nav className="hidden md:flex items-center gap-8">
+
+                        {isLoggedIn && (
+                            <button
+                                onClick={() => onNavigate(isLoggedIn ? 'tasks' : 'login')}
+                                className="text-primary font-bold pb-1 font-label-md hover:text-primary transition-colors duration-200 bg-transparent cursor-pointer"
+                            >
+                                Acasă
+                            </button>
+                        )}
+                    </nav>
+                </div>
+
+                <div className="hidden lg:flex flex-1 max-w-md mx-8">
+                    <div className="relative w-full">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                        <input
+                            className="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary focus:bg-white transition-all outline-none"
+                            placeholder="Caută anunțuri..."
+                            type="text"
+                            onChange={(e) => onSearch(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4 md:gap-6">
+                    {!isLoggedIn ? (
+                        <>
+                            <button
+                                onClick={() => onNavigate('login')}
+                                className="text-on-surface font-semibold font-label-md hover:text-primary transition-colors duration-200 bg-transparent border-none cursor-pointer"
+                            >
                                 Logare
                             </button>
-                        </li>
-                        <li className="nav-item">
-                            <button onClick={() => onNavigate('register')} className="nav-link nav-btn" style={{ background: '#11998e', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
-                                Inregistrare
+                            <button
+                                onClick={() => onNavigate('register')}
+                                className="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md font-bold hover:opacity-90 active:scale-95 transition-all shadow-sm border-none cursor-pointer"
+                            >
+                                Înregistrare
                             </button>
-                        </li>
-                    </>
-                ) : (
-                    <>
-                        <NotificariDropdown />
-                        <li className="nav-item">
-                            <button onClick={() => onNavigate('profil')} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'inherit' }}>
-                                Profil
+                        </>
+                    ) : (
+                        <>
+                            <button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full lg:hidden bg-transparent border-none cursor-pointer">
+                                <span className="material-symbols-outlined">search</span>
                             </button>
-                        </li>
-                        <li className="nav-item">
-                            <button onClick={onLogout} className="nav-link nav-btn" style={{ background: '#d32f2f', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'white' }}>
-                                Iesire cont
-                            </button>
-                        </li>
-                    </>
-                )}
 
-                <li className="nav-item search-container" style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f1f1f1', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                    <FaSearch className="search-icon" style={{ color: '#888', marginRight: '5px' }} />
-                    <input
-                        type="text"
-                        placeholder="Cauta anunturi..."
-                        onChange={(e) => onSearch(e.target.value)}
-                        style={{ border: 'none', background: 'transparent', outline: 'none', padding: '0.3rem', width: '150px' }}
-                    />
-                </li>
-            </ul>
-        </nav>
+                            <NotificariDropdown onNavigate={onNavigate} />
+
+                            <div className="hidden sm:block h-8 w-[1px] bg-outline-variant mx-2"></div>
+
+                            <button
+                                onClick={() => onNavigate('profil')}
+                                className="flex items-center gap-2 group p-1.5 rounded-full hover:bg-surface-container-low transition-all bg-transparent border-none cursor-pointer"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+                                    <span className="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+                                </div>
+                                <span className="hidden sm:inline font-label-md text-on-surface group-hover:text-primary">Profilul meu</span>
+                            </button>
+
+                            <button
+                                onClick={onLogout}
+                                className="ml-2 border border-outline-variant text-on-surface-variant hover:border-error hover:text-error px-4 py-2 rounded-lg font-label-md transition-all flex items-center gap-2 active:scale-95 bg-transparent cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">logout</span>
+                                <span className="hidden md:inline">Ieșire</span>
+                            </button>
+                        </>
+                    )}
+                </div>
+
+            </div>
+        </header>
     );
 }
 

@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { creareTask, getTasks } = require('../controllers/taskController')
 const { protejeazaRuta } = require('../middlewares/authMiddleware')
-const { finalizeazaTask, stergeTask, editeazaTask } = require("../controllers/taskController")
+const { finalizeazaTask, stergeTask, editeazaTask, getTaskuriPaginate } = require("../controllers/taskController")
 const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
@@ -25,6 +25,8 @@ const upload = multer({ storage: storage });
 router.get('/', getTasks)
 
 router.post('/', protejeazaRuta, upload.single('imagine'), creareTask)
+
+router.get('/feed', getTaskuriPaginate);
 
 router.put('/:id/finalizeaza', protejeazaRuta, finalizeazaTask);
 
