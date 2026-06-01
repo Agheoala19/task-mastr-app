@@ -6,6 +6,7 @@ function Login({ onLoginSuccess, onGoToRegister }) {
     const [parola, setParola] = useState('');
     const [eroare, setEroare] = useState('');
     const [loading, setLoading] = useState(false);
+    const [arataParola, setArataParola] = useState(false); // Stare pentru vizibilitatea parolei
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,57 +18,122 @@ function Login({ onLoginSuccess, onGoToRegister }) {
             localStorage.setItem('token', response.data.token);
             onLoginSuccess();
         } catch (error) {
-            setEroare(error.response?.data?.mesaj || 'Eroare la conectare. Verifica datele!');
+            setEroare(error.response?.data?.mesaj || 'Eroare la conectare. Verifică datele!');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ color: '#11998e', textAlign: 'center', marginBottom: '1.5rem' }}>Conectare Cont</h2>
+        <div className="bg-background min-h-[calc(100vh-64px)] flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+            {/* Decorative Elements for "Organized Momentum" */}
+            <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-fixed opacity-10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary-container opacity-20 rounded-full blur-[120px] pointer-events-none"></div>
 
-            {eroare && (
-                <div style={{ backgroundColor: '#ffebee', color: '#c62828', padding: '10px', borderRadius: '4px', marginBottom: '1rem', textAlign: 'center', fontSize: '0.9rem' }}>
-                    {eroare}
+            <div className="w-full max-w-[440px] relative z-10">
+                <div className="flex justify-center mb-8">
+                    <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>task_alt</span>
+                        <span className="font-headline-md text-headline-md font-bold text-primary">TaskMastR</span>
+                    </div>
                 </div>
-            )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
-                />
+                <div className="bg-surface-container-lowest shadow-[0_20px_25px_-5px_rgba(79,95,119,0.05),0_10px_10px_-5px_rgba(79,95,119,0.04)] rounded-xl border border-outline-variant p-8 md:p-10">
+                    <header className="text-center mb-8">
+                        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2 mt-0">Conectare Cont</h1>
+                        <p className="font-body-md text-body-md text-on-surface-variant m-0">Introdu datele tale pentru a accesa platforma</p>
+                    </header>
 
-                <input
-                    type="password"
-                    placeholder="Parola"
-                    value={parola}
-                    onChange={(e) => setParola(e.target.value)}
-                    required
-                    style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
-                />
+                    {eroare && (
+                        <div className="mb-6 p-4 bg-error-container text-on-error-container rounded-lg flex items-center gap-3 border border-error/20">
+                            <span className="material-symbols-outlined text-error">error</span>
+                            <p className="font-label-md text-label-md m-0">{eroare}</p>
+                        </div>
+                    )}
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ marginTop: '1rem', padding: '1rem', backgroundColor: loading ? '#ccc' : '#11998e', color: 'white', border: 'none', borderRadius: '4px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '1rem' }}
-                >
-                    {loading ? 'Se conecteaza...' : 'Intra in cont'}
-                </button>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div className="space-y-2">
+                            <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="email">Email</label>
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span className="material-symbols-outlined text-outline text-[20px] group-focus-within:text-primary transition-colors">mail</span>
+                                </div>
+                                <input
+                                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-11 pr-4 text-on-surface font-body-md placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                                    id="email"
+                                    type="email"
+                                    placeholder="exemplu@taskmastr.ro"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                <button
-                    type="button"
-                    onClick={onGoToRegister}
-                    style={{ marginTop: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', color: '#11998e', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                    Nu ai cont? Inregistreaza-te aici
-                </button>
-            </form>
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="password">Parola</label>
+                                <a className="font-label-md text-label-md text-primary hover:underline decoration-2 underline-offset-4" href="#" onClick={(e) => e.preventDefault()}>Ai uitat parola?</a>
+                            </div>
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span className="material-symbols-outlined text-outline text-[20px] group-focus-within:text-primary transition-colors">lock</span>
+                                </div>
+                                <input
+                                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-11 pr-12 text-on-surface font-body-md placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                                    id="password"
+                                    type={arataParola ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    value={parola}
+                                    onChange={(e) => setParola(e.target.value)}
+                                    required
+                                />
+                                <button
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-outline transition-colors cursor-pointer bg-transparent border-none"
+                                    type="button"
+                                    onClick={() => setArataParola(!arataParola)}
+                                >
+                                    <span className="material-symbols-outlined">{arataParola ? 'visibility_off' : 'visibility'}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center">
+                            <input
+                                className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer"
+                                id="remember"
+                                type="checkbox"
+                            />
+                            <label className="ml-3 font-body-md text-body-md text-on-surface-variant cursor-pointer select-none" htmlFor="remember">
+                                Ține-mă minte pe acest dispozitiv
+                            </label>
+                        </div>
+
+                        <button
+                            className="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-4 rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer border-none disabled:opacity-70 disabled:cursor-not-allowed"
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {loading ? 'Se conectează...' : 'Intră în cont'}
+                            {!loading && <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>}
+                        </button>
+                    </form>
+
+
+                </div>
+
+                <footer className="mt-8 text-center">
+                    <p className="font-body-md text-body-md text-on-surface-variant m-0">
+                        Nu ai încă un cont?
+                        <button
+                            onClick={onGoToRegister}
+                            className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1 cursor-pointer bg-transparent border-none text-body-md"
+                        >
+                            Înregistrează-te aici
+                        </button>
+                    </p>
+                </footer>
+            </div>
         </div>
     );
 }

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Navbar from './components/Navbar'
-import TaskList from './components/TaskList'
-import Login from './components/Login'
-import Inregistrare from './components/Inregistrare'
-import Profil from './components/Profil'
-import Chat from './components/Chat'
+import { useState, useEffect } from 'react';
+import './App.css';
+import Navbar from './components/Navbar';
+import TaskList from './components/TaskList';
+import Login from './components/Login';
+import Inregistrare from './components/Inregistrare';
+import Profil from './components/Profil';
+import Chat from './components/Chat';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -50,47 +50,59 @@ function App() {
     setTaskTarget(taskId);
   };
 
+  const renderContent = () => {
+    if (!isLoggedIn) {
+      if (view === 'register') {
+        return (
+          <Inregistrare
+            onInregistrareSuccess={handleAuthSuccess}
+            onInapoiLaLogin={() => handleNavigate('login')}
+          />
+        );
+      }
+      return (
+        <Login
+          onLoginSuccess={handleAuthSuccess}
+          onGoToRegister={() => handleNavigate('register')}
+        />
+      );
+    }
+
+    if (view === 'profil') {
+      return <Profil utilizatorCurent={utilizatorCurent} taskTarget={taskTarget} />;
+    }
+    if (view === 'admin') {
+      return <AdminDashboard utilizatorCurent={utilizatorCurent} />;
+    }
+
+    return (
+      <TaskList
+        utilizatorCurent={utilizatorCurent}
+        termenCautare={termenCautare}
+        onNavigate={handleNavigate}
+        taskTarget={taskTarget}
+      />
+    );
+  };
+
   return (
-    <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+    <div className="bg-background min-h-screen font-body-md text-on-surface">
       <Navbar
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
         onSearch={setTermenCautare}
+        currentView={view}
+        utilizatorCurent={utilizatorCurent}
       />
 
       <Chat utilizatorCurent={utilizatorCurent} />
 
       <main>
-        {!isLoggedIn ? (
-          view === 'login' ? (
-            <Login
-              onLoginSuccess={handleAuthSuccess}
-              onGoToRegister={() => handleNavigate('register')}
-            />
-          ) : (
-            <Inregistrare
-              onInregistrareSuccess={handleAuthSuccess}
-              onInapoiLaLogin={() => handleNavigate('login')}
-            />
-          )
-        ) : (
-          view === 'tasks' ? (
-            <TaskList
-              utilizatorCurent={utilizatorCurent}
-              termenCautare={termenCautare}
-              onNavigate={handleNavigate}
-            />
-          ) : (
-            <Profil
-              utilizatorCurent={utilizatorCurent}
-              taskTarget={taskTarget}
-            />
-          )
-        )}
+        {renderContent()}
       </main>
     </div>
-  )
+  );
 }
 
 export default App;

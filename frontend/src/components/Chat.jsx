@@ -10,6 +10,7 @@ function Chat({ utilizatorCurent }) {
 
     const mesajeEndRef = useRef(null);
     const chatContainerRef = useRef(null);
+    const avatarDefault = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
     const fetchConversatii = async () => {
         try {
@@ -59,9 +60,7 @@ function Chat({ utilizatorCurent }) {
                 setMeniuDeschis(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickInAfara);
-
         return () => {
             document.removeEventListener('mousedown', handleClickInAfara);
         };
@@ -88,79 +87,93 @@ function Chat({ utilizatorCurent }) {
     if (!utilizatorCurent) return null;
 
     return (
-        <div ref={chatContainerRef} style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
+        <div ref={chatContainerRef} className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex flex-col items-end">
 
             {meniuDeschis && (
-                <div style={{
-                    position: 'absolute', bottom: '70px', right: '0', width: '350px', height: '450px',
-                    backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '12px',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', overflow: 'hidden'
-                }}>
+                <div className="flex flex-col w-[340px] sm:w-[380px] h-[500px] sm:h-[560px] bg-white rounded-xl shadow-[0_12px_40px_rgba(79,95,119,0.12)] border border-outline-variant mb-4 overflow-hidden origin-bottom-right transition-all duration-300">
 
                     {!chatActiv ? (
-                        <>
-                            <div style={{ backgroundColor: '#2c3e50', padding: '15px', color: 'white', fontWeight: 'bold' }}>
-                                Mesajele Mele
-                            </div>
-                            <div style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {conversatii.length === 0 ? (
-                                    <p style={{ textAlign: 'center', color: '#888', marginTop: '2rem' }}>Nu ai nicio conversatie activa.</p>
-                                ) : (
-                                    conversatii.map(conv => (
-                                        <div
-                                            key={conv.task._id}
-                                            onClick={() => setChatActiv(conv)}
-                                            style={{
-                                                padding: '12px', borderRadius: '8px', cursor: 'pointer', border: '1px solid #eee',
-                                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                                backgroundColor: conv.necitite > 0 ? 'white' : '#f0f0f0'
-                                            }}
-                                        >
-                                            <div>
-                                                <div style={{ fontWeight: conv.necitite > 0 ? 'bold' : 'normal', color: '#333', fontSize: '0.95rem' }}>
-                                                    {conv.partener.nume} {conv.partener.prenume}
-                                                </div>
-                                                <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '3px' }}>
-                                                    Anunt: {conv.task.titlu}
-                                                </div>
-                                            </div>
+                        <div className="flex flex-col h-full bg-white">
+                            <header className="p-4 bg-primary text-on-primary flex justify-between items-center shrink-0">
+                                <h2 className="font-headline-md text-headline-md m-0">Mesajele Mele</h2>
+                                <button onClick={() => setMeniuDeschis(false)} className="p-1 hover:bg-primary-container rounded-full transition-colors cursor-pointer border-none bg-transparent flex items-center text-white">
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </header>
 
-                                            {conv.necitite > 0 && (
-                                                <div style={{ backgroundColor: '#e74c3c', color: 'white', borderRadius: '50%', padding: '4px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                                    {conv.necitite}
+                            <div className="flex-1 overflow-y-auto p-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                {conversatii.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-70">
+                                        <span className="material-symbols-outlined text-5xl text-outline mb-2">forum</span>
+                                        <p className="text-on-surface-variant text-label-md m-0">Nu ai nicio conversație activă în acest moment.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {conversatii.map(conv => (
+                                            <div
+                                                key={conv.task._id}
+                                                onClick={() => setChatActiv(conv)}
+                                                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors relative group ${conv.necitite > 0 ? 'bg-surface-container hover:bg-surface-container-high' : 'hover:bg-surface-container-low'
+                                                    }`}
+                                            >
+                                                <div className="relative">
+                                                    <img
+                                                        src={conv.partener.avatar ? `http://localhost:5000${conv.partener.avatar}` : avatarDefault}
+                                                        alt="Avatar"
+                                                        className="w-12 h-12 rounded-full object-cover border border-outline-variant"
+                                                    />
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between items-baseline">
+                                                        <h3 className={`font-label-md truncate m-0 ${conv.necitite > 0 ? 'text-on-surface font-bold' : 'text-on-surface-variant'}`}>
+                                                            {conv.partener.nume} {conv.partener.prenume}
+                                                        </h3>
+                                                    </div>
+                                                    <p className="text-label-sm text-primary font-semibold truncate m-0 mt-0.5">{conv.task.titlu}</p>
+                                                </div>
+                                                {conv.necitite > 0 && (
+                                                    <div className="w-2.5 h-2.5 bg-error rounded-full shrink-0 shadow-sm"></div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
-                        </>
+                        </div>
                     ) : (
-                        <>
-                            <div style={{ backgroundColor: '#2c3e50', padding: '12px 15px', color: 'white', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <button onClick={() => setChatActiv(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1.2rem', padding: '0 5px' }}>
-                                    ←
+                        <div className="flex flex-col h-full bg-surface">
+                            <header className="p-4 bg-surface-container-lowest border-b border-outline-variant flex items-center gap-3 shrink-0">
+                                <button onClick={() => setChatActiv(null)} className="p-1 hover:bg-surface-container-low rounded-full transition-colors text-primary flex items-center cursor-pointer border-none bg-transparent">
+                                    <span className="material-symbols-outlined">arrow_back</span>
                                 </button>
-                                <div>
-                                    <div style={{ fontWeight: 'bold' }}>{chatActiv.partener.nume}</div>
-                                    <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>{chatActiv.task.titlu}</div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-label-md text-on-surface truncate m-0">{chatActiv.partener.nume} {chatActiv.partener.prenume}</h3>
+                                    <p className="text-[12px] text-on-surface-variant truncate m-0 mt-0.5">{chatActiv.task.titlu}</p>
                                 </div>
-                            </div>
+                            </header>
 
-                            <div style={{ flex: 1, overflowY: 'auto', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#f9f9f9' }}>
+                            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-surface" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                 {mesaje.length === 0 ? (
-                                    <p style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem' }}>Niciun mesaj. Trimite un salut!</p>
+                                    <p className="text-center text-outline text-[13px] mt-4">Trimite un prim mesaj pentru a începe conversația!</p>
                                 ) : (
                                     mesaje.map(m => {
                                         const isMine = m.id_expeditor?._id === utilizatorCurent?.id || m.id_expeditor === utilizatorCurent?.id;
+                                        // Formatam ora daca exista data
+                                        const timeStr = m.createdAt ? new Date(m.createdAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) : '';
+
                                         return (
-                                            <div key={m._id} style={{ alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
-                                                <div style={{
-                                                    backgroundColor: isMine ? '#11998e' : '#e0e0e0', color: isMine ? 'white' : '#333',
-                                                    padding: '8px 12px', borderRadius: '15px', borderBottomRightRadius: isMine ? '0' : '15px', borderBottomLeftRadius: isMine ? '15px' : '0'
-                                                }}>
+                                            <div key={m._id} className={`flex flex-col ${isMine ? 'items-end ml-auto' : 'items-start'} max-w-[85%]`}>
+                                                <div className={`px-4 py-2 text-body-md shadow-sm ${isMine
+                                                    ? 'bg-primary text-white rounded-[12px_12px_2px_12px]'
+                                                    : 'bg-surface-container-high text-on-surface rounded-[12px_12px_12px_2px]'
+                                                    }`}>
                                                     {m.continut}
                                                 </div>
+                                                {timeStr && (
+                                                    <span className={`text-[10px] text-on-surface-variant mt-1 ${isMine ? 'mr-1' : 'ml-1'}`}>
+                                                        {timeStr}
+                                                    </span>
+                                                )}
                                             </div>
                                         );
                                     })
@@ -168,37 +181,43 @@ function Chat({ utilizatorCurent }) {
                                 <div ref={mesajeEndRef} />
                             </div>
 
-                            <form onSubmit={handleTrimite} style={{ display: 'flex', borderTop: '1px solid #ddd', backgroundColor: 'white' }}>
-                                <input type="text" value={mesajNou} onChange={e => setMesajNou(e.target.value)} placeholder="Scrie un mesaj..." style={{ flex: 1, padding: '12px', border: 'none', outline: 'none' }} />
-                                <button type="submit" style={{ backgroundColor: 'transparent', color: '#11998e', border: 'none', padding: '0 15px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                    Trimite
+                            <form onSubmit={handleTrimite} className="p-3 sm:p-4 bg-surface-container-lowest border-t border-outline-variant flex gap-2 items-end">
+                                <div className="flex-1 relative">
+                                    <input
+                                        type="text"
+                                        value={mesajNou}
+                                        onChange={e => setMesajNou(e.target.value)}
+                                        placeholder="Scrie un mesaj..."
+                                        className="w-full py-2.5 px-4 bg-surface-container-low rounded-full border border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary text-body-md outline-none transition-all"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={!mesajNou.trim()}
+                                    className="bg-primary text-on-primary w-11 h-11 rounded-full hover:bg-primary-container transition-all active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none shadow-sm shrink-0"
+                                >
+                                    <span className="material-symbols-outlined" style={{ marginLeft: '4px' }}>send</span>
                                 </button>
                             </form>
-                        </>
+                        </div>
                     )}
                 </div>
             )}
 
             <button
                 onClick={() => setMeniuDeschis(!meniuDeschis)}
-                style={{
-                    width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#2c3e50', color: 'white',
-                    border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)', position: 'relative'
-                }}
+                className="w-14 h-14 md:w-16 md:h-16 bg-primary text-on-primary rounded-full shadow-[0_4px_14px_rgba(0,104,96,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 relative cursor-pointer border-none group"
             >
-                <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
-
-                {totalNecitite > 0 && (
-                    <div style={{
-                        position: 'absolute', top: '-5px', right: '-5px', backgroundColor: '#e74c3c', color: 'white',
-                        borderRadius: '50%', minWidth: '22px', height: '22px', fontSize: '0.8rem', fontWeight: 'bold',
-                        display: 'flex', justifyContent: 'center', alignItems: 'center', border: '2px solid white'
-                    }}>
+                {totalNecitite > 0 && !meniuDeschis && (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-error text-white text-[11px] font-bold flex items-center justify-center rounded-full border-2 border-surface shadow-sm z-10">
                         {afisajNecitite}
                     </div>
                 )}
+                <span className="material-symbols-outlined text-[28px] md:text-[32px] transition-transform duration-300 group-hover:rotate-12">
+                    {meniuDeschis ? 'close' : 'chat_bubble'}
+                </span>
             </button>
+
         </div>
     );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../api';
 
-function NotificariDropdown({ onNavigate }) {
+function NotificariDropdown({ onNavigate, utilizatorCurent }) {
     const [notificari, setNotificari] = useState([]);
     const [meniuDeschis, setMeniuDeschis] = useState(false);
     const dropdownRef = useRef(null);
@@ -48,7 +48,11 @@ function NotificariDropdown({ onNavigate }) {
     const handleClickNotificare = (id_task) => {
         setMeniuDeschis(false);
         if (onNavigate) {
-            onNavigate('profil', id_task);
+            if (utilizatorCurent?.rol === 'administrator') {
+                onNavigate('tasks', id_task);
+            } else {
+                onNavigate('profil', id_task);
+            }
         }
     };
 
@@ -56,7 +60,6 @@ function NotificariDropdown({ onNavigate }) {
 
     return (
         <div ref={dropdownRef} className="relative flex items-center">
-
             <button
                 onClick={toggleMeniu}
                 className="relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all bg-transparent border-none cursor-pointer flex items-center justify-center"
@@ -71,14 +74,12 @@ function NotificariDropdown({ onNavigate }) {
             </button>
 
             {meniuDeschis && (
-                <div className="absolute top-[50px] right-0 w-[350px] bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container-highest overflow-hidden z-[1000] flex flex-col">
-
+                <div className="absolute top-[50px] right-0 w-[350px] bg-white rounded-xl shadow-xl border border-surface-container-highest overflow-hidden z-[1000] flex flex-col">
                     <div className="p-4 border-b border-surface-container-highest flex justify-between items-center bg-surface-bright">
                         <h4 className="font-bold text-on-surface font-label-md m-0">Notificări</h4>
                     </div>
 
                     <div className="max-h-[380px] overflow-y-auto">
-
                         {notificari.length === 0 ? (
                             <div className="py-12 flex flex-col items-center justify-center text-center px-8">
                                 <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center mb-4">

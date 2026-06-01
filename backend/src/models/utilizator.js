@@ -43,7 +43,7 @@ const utilizatorSchema = new mongoose.Schema({
     },
     rol: {
         type: String,
-        enum: ['beneficiar', 'prestator'],
+        enum: ['beneficiar', 'prestator', 'administrator'],
         default: 'beneficiar'
     },
     avatar: {

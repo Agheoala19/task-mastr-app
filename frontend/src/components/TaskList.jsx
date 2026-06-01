@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { FaStar } from 'react-icons/fa';
+
+const eliminaDiacritice = (text) => {
+    if (!text) return "";
+    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+};
 
 function TaskList({ utilizatorCurent, termenCautare, onNavigate }) {
     const [taskuri, setTaskuri] = useState([]);
@@ -17,6 +21,9 @@ function TaskList({ utilizatorCurent, termenCautare, onNavigate }) {
         imagine: null
     });
     const [notificare, setNotificare] = useState(null);
+
+    const [taskPentruAplicare, setTaskPentruAplicare] = useState(null);
+    const [formAplicare, setFormAplicare] = useState({ pret: '', mesaj: '' });
 
     const afiseazaNotificare = (tip, text) => {
         setNotificare({ tip, text });
@@ -90,28 +97,36 @@ function TaskList({ utilizatorCurent, termenCautare, onNavigate }) {
         }
     };
 
-    const handleAplica = async (idTask) => {
-        const pret = prompt("Introdu prețul pe care îl propui (RON):");
-        if (!pret) return;
-        const mesaj = prompt("Lasă un scurt mesaj beneficiarului:");
-        if (!mesaj) return;
+    const deschideFereastraAplicare = (task) => {
+        setTaskPentruAplicare(task._id);
+        setFormAplicare({ pret: task.buget_estimativ || '', mesaj: '' });
+    };
 
+    const handleTrimiteAplicare = async (idTask) => {
+        if (!formAplicare.pret || !formAplicare.mesaj) {
+            afiseazaNotificare("eroare", "Te rugăm să completezi ambele câmpuri!");
+            return;
+        }
         try {
-            await api.post('/aplicari', { id_task: idTask, pret_propus: Number(pret), mesaj_oferta: mesaj });
-            afiseazaNotificare('succes', 'Ai aplicat cu succes la acest anunț!');
+            await api.post('/aplicari', {
+                id_task: idTask,
+                pret_propus: formAplicare.pret,
+                mesaj_oferta: formAplicare.mesaj
+            });
+            afiseazaNotificare('succes', 'Ofertă trimisă cu succes!');
+            setTaskPentruAplicare(null);
         } catch (error) {
-            console.error("Eroare la aplicare:", error);
-            afiseazaNotificare('eroare', error.response?.data?.mesaj || 'A apărut o eroare la trimiterea ofertei.');
+            afiseazaNotificare('eroare', error.response?.data?.mesaj || "Eroare la trimiterea ofertei.");
         }
     };
 
     const taskuriFiltrate = taskuri.filter(task => {
         if (!termenCautare) return true;
-        const textCautat = termenCautare.toLowerCase();
+        const textCautat = eliminaDiacritice(termenCautare);
         return (
-            task.titlu?.toLowerCase().includes(textCautat) ||
-            task.descriere?.toLowerCase().includes(textCautat) ||
-            task.locatie?.toLowerCase().includes(textCautat)
+            eliminaDiacritice(task.titlu).includes(textCautat) ||
+            eliminaDiacritice(task.descriere).includes(textCautat) ||
+            eliminaDiacritice(task.locatie).includes(textCautat)
         );
     });
 
@@ -199,13 +214,50 @@ function TaskList({ utilizatorCurent, termenCautare, onNavigate }) {
                                     {utilizatorCurent && utilizatorCurent.rol === 'prestator' && (
                                         <div className="flex justify-end items-center border-t border-outline-variant/30 pt-4 mt-4">
                                             <button
-                                                onClick={() => handleAplica(task._id)}
+                                                onClick={() => deschideFereastraAplicare(task)}
                                                 className="bg-[#ff9800] hover:bg-[#f57c00] text-white px-6 py-2.5 rounded-lg font-label-md text-label-md transition-transform active:scale-95 shadow-md cursor-pointer border-none"
                                             >
                                                 Aplică la acest anunț
                                             </button>
                                         </div>
                                     )}
+
+                                    {taskPentruAplicare === task._id && (
+                                        <div className="bg-surface-container-low p-6 border-t border-surface-variant mt-4 rounded-b-xl">
+                                            <h4 className="text-primary font-headline-md m-0 mb-4">Trimite Oferta Ta</h4>
+                                            <div className="space-y-4">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Preț propus (RON)"
+                                                    value={formAplicare.pret}
+                                                    onChange={e => setFormAplicare({ ...formAplicare, pret: e.target.value })}
+                                                    className="w-full p-3 rounded-lg border border-outline-variant outline-none focus:border-primary"
+                                                />
+                                                <textarea
+                                                    placeholder="Mesaj pentru client (de ce ești potrivit pentru lucrare?)..."
+                                                    value={formAplicare.mesaj}
+                                                    onChange={e => setFormAplicare({ ...formAplicare, mesaj: e.target.value })}
+                                                    className="w-full p-3 rounded-lg border border-outline-variant outline-none focus:border-primary"
+                                                    rows="3"
+                                                ></textarea>
+                                                <div className="flex gap-2 pt-2">
+                                                    <button
+                                                        onClick={() => handleTrimiteAplicare(task._id)}
+                                                        className="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md cursor-pointer border-none hover:opacity-90"
+                                                    >
+                                                        Trimite
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setTaskPentruAplicare(null)}
+                                                        className="bg-surface-container-highest text-on-surface px-6 py-2 rounded-lg font-label-md cursor-pointer border-none hover:bg-outline-variant"
+                                                    >
+                                                        Anulează
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                 </div>
                             ))}
                         </div>
