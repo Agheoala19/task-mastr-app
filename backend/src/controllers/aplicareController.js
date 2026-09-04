@@ -1,6 +1,6 @@
-const Aplicare = require('../models/Aplicare');
-const Task = require('../models/Task');
-const Notificare = require('../models/Notificare');
+const Aplicare = require('../models/aplicare');
+const Task = require('../models/task');
+const Notificare = require('../models/notificare');
 const logger = require('../config/logger');
 
 exports.creareAplicare = async (req, res) => {
