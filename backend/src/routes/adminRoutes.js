@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Utilizator = require('../models/Utilizator');
-const Task = require('../models/Task');
+const Utilizator = require('../models/utilizator');
+const Task = require('../models/task');
 const { protejeazaRuta } = require('../middlewares/authMiddleware');
 
 const isAdmin = (req, res, next) => {
