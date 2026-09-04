@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const Utilizator = require('../models/Utilizator')
+const Utilizator = require('../models/utilizator')
 
 const protejeazaRuta = async (req, res, next) => {
     let token
