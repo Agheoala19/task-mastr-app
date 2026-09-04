@@ -1,5 +1,5 @@
-const Mesaj = require('../models/Mesaj');
-const Task = require('../models/Task');
+const Mesaj = require('../models/mesaj');
+const Task = require('../models/task');
 
 exports.trimiteMesaj = async (req, res) => {
     try {
