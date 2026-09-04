@@ -1,9 +1,9 @@
-const Task = require('../models/Task')
+const Task = require('../models/task')
 const logger = require('../config/logger')
-const Utilizator = require('../models/Utilizator')
-const Recenzie = require('../models/Recenzie')
-const Notificare = require('../models/Notificare')
-const Aplicare = require('../models/Aplicare')
+const Utilizator = require('../models/utilizator')
+const Recenzie = require('../models/recenzie')
+const Notificare = require('../models/notificare')
+const Aplicare = require('../models/aplicare')
 
 exports.creareTask = async (req, res) => {
     try {
