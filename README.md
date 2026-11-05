@@ -1,6 +1,12 @@
 TaskMastR is a full-stack web platform developed to connect clients with local service providers in the collaborative economy. 
 Built with the MERN stack, it offers a secure, transparent, and efficient environment for posting tasks, direct bidding, and managing local services
 
+Application Demo:
+
+[![Watch Demo](https://img.youtube.com/vi/2pLEbrAqXLI/maxresdefault.jpg)](https://www.youtube.com/watch?v=2pLEbrAqXLI)
+
+Click on the preview to watch the full application demonstration.
+
 Tech Stack 
 
 Frontend: React, Tailwind CSS  
