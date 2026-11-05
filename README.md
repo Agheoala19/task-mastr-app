@@ -7,6 +7,8 @@ Application Demo:
 
 Click on the preview to watch the full application demonstration.
 
+Live Demo: https://task-mastr-app.onrender.com/ -> use credentials from LoginCredentialsForTesting.txt
+
 Tech Stack 
 
 Frontend: React, Tailwind CSS  
