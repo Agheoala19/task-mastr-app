@@ -81,7 +81,6 @@ exports.acceptaOferta = async (req, res) => {
         task.id_prestator_selectat = aplicare.id_prestator;
         await task.save();
 
-        const Notificare = require('../models/Notificare');
         const notificareNoua = new Notificare({
             id_utilizator: aplicare.id_prestator,
             id_task: task._id,
